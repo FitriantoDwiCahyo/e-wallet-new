@@ -96,7 +96,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   //NOTE: Password Input
                   CustomFormField(
                     title: 'Password',
-                    obscureText: true,
+                    obsecureText: true,
                     controller: passwordController,
                   ),
                   const SizedBox(height: 8),

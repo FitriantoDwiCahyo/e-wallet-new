@@ -8,7 +8,9 @@ import 'package:e_wallet_new/ui/widgets/home_service_item.dart';
 import 'package:e_wallet_new/ui/widgets/home_tips_item.dart';
 import 'package:e_wallet_new/ui/widgets/home_user_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../blocs/auth/auth_bloc.dart';
 import '../../shared/theme.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -91,121 +93,136 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget buildProfile(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 40),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+      if (state is AuthSuccess) {
+        return Container(
+          margin: const EdgeInsets.only(top: 40),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text(
-                'Hello',
-                style: greyTextStyle.copyWith(
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(
-                height: 2,
-              ),
-              Text(
-                'rian dwi',
-                style: blackTextStyle.copyWith(
-                  fontSize: 20,
-                  fontWeight: semiBold,
-                ),
-              ),
-            ],
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).pushNamed(ProfileScreen.routeName);
-            },
-            child: Container(
-              width: 60,
-              height: 60,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: AssetImage(
-                    'assets/img_profile.png',
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Hello',
+                    style: greyTextStyle.copyWith(
+                      fontSize: 16,
+                    ),
                   ),
-                ),
+                  const SizedBox(
+                    height: 2,
+                  ),
+                  Text(
+                    state.user.name.toString(),
+                    style: blackTextStyle.copyWith(
+                      fontSize: 20,
+                      fontWeight: semiBold,
+                    ),
+                  ),
+                ],
               ),
-              child: Align(
-                alignment: Alignment.topRight,
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pushNamed(ProfileScreen.routeName);
+                },
                 child: Container(
-                  width: 16,
-                  height: 16,
+                  width: 60,
+                  height: 60,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: whiteColor,
+                    image: DecorationImage(
+                      image: state.user.profilePicture == null
+                          ? const AssetImage(
+                              'assets/img_profile.png',
+                            )
+                          : NetworkImage(state.user.profilePicture!)
+                              as ImageProvider,
+                    ),
                   ),
-                  child: Center(
-                    child: Icon(
-                      Icons.check_circle,
-                      color: greenColor,
-                      size: 14,
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: whiteColor,
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.check_circle,
+                          color: greenColor,
+                          size: 14,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
+        );
+      }
+      return Container();
+    });
   }
 
   Widget buildWalletCard() {
-    return Container(
-      width: double.infinity,
-      height: 220,
-      margin: const EdgeInsets.only(
-        top: 30,
-      ),
-      padding: const EdgeInsets.all(
-        20,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        image: const DecorationImage(
-          image: AssetImage('assets/img_bg_card.png'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Text(
-            'Rian Dwi',
-            style: whiteTextStyle.copyWith(
-              fontSize: 18,
-              fontWeight: medium,
+    return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+      if (state is AuthSuccess) {
+        return Container(
+          width: double.infinity,
+          height: 220,
+          margin: const EdgeInsets.only(
+            top: 30,
+          ),
+          padding: const EdgeInsets.all(
+            20,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            image: const DecorationImage(
+              image: AssetImage('assets/img_bg_card.png'),
+              fit: BoxFit.cover,
             ),
           ),
-          Text(
-            '**** **** **** 1280',
-            style: whiteTextStyle.copyWith(
-              fontSize: 18,
-              fontWeight: medium,
-              letterSpacing: 6,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                state.user.name.toString(),
+                style: whiteTextStyle.copyWith(
+                  fontSize: 18,
+                  fontWeight: medium,
+                ),
+              ),
+              Text(
+                '**** **** **** ${state.user.cardNumber!.substring(12,16)}',
+                style: whiteTextStyle.copyWith(
+                  fontSize: 18,
+                  fontWeight: medium,
+                  letterSpacing: 6,
+                ),
+              ),
+              const SizedBox(
+                height: 34,
+              ),
+              Text(
+                'Balance',
+                style: whiteTextStyle,
+              ),
+              Text(
+                formatCurrency(state.user.balance ?? 0),
+                style:
+                    whiteTextStyle.copyWith(fontSize: 24, fontWeight: semiBold),
+              ),
+            ],
           ),
-          const SizedBox(
-            height: 34,
-          ),
-          Text(
-            'Balance',
-            style: whiteTextStyle,
-          ),
-          Text(
-            formatCurrency(14500),
-            style: whiteTextStyle.copyWith(fontSize: 24, fontWeight: semiBold),
-          ),
-        ],
-      ),
+        );
+      }
+      return Container();
+    }
     );
   }
 
@@ -444,7 +461,8 @@ class HomeScreen extends StatelessWidget {
             height: 14,
           ),
           Wrap(
-            spacing: 23,
+            // alignment: WrapAlignment.end,
+            spacing: 50,
             runSpacing: 10,
             children: const [
               HomeTipsItem(

@@ -115,7 +115,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   CustomFormField(
                     title: 'Password',
                     controller: passwordController,
-                    obscureText: true,
+                    obsecureText: true,
                   ),
 
                   const SizedBox(height: 16),

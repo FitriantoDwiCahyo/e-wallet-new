@@ -119,7 +119,7 @@ class _SignUpUploadProfileScreenState extends State<SignUpUploadProfileScreen> {
                 ),
                 CustomFormField(
                   title: 'Set PIN (6 digit number)',
-                  obscureText: true,
+                  obsecureText: true,
                   controller: pinController,
                   keyboardType: TextInputType.number,
                 ),

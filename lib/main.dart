@@ -11,9 +11,9 @@ import 'package:e_wallet_new/ui/screens/profile_edit_success_screen.dart';
 import 'package:e_wallet_new/ui/screens/profile_screen.dart';
 import 'package:e_wallet_new/ui/screens/sign_in_screen.dart';
 import 'package:e_wallet_new/ui/screens/sign_up_screen.dart';
-import 'package:e_wallet_new/ui/screens/sign_up_set_ktp_screen.dart';
+// import 'package:e_wallet_new/ui/screens/sign_up_set_ktp_screen.dart';
 import 'package:e_wallet_new/ui/screens/sign_up_success_screen.dart';
-import 'package:e_wallet_new/ui/screens/sign_up_upload_profile_screen.dart';
+// import 'package:e_wallet_new/ui/screens/sign_up_upload_profile_screen.dart';
 import 'package:e_wallet_new/ui/screens/splash_screen.dart';
 import 'package:e_wallet_new/ui/screens/topup_amount_screen.dart';
 import 'package:e_wallet_new/ui/screens/topup_screen.dart';
@@ -32,13 +32,13 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => AuthBloc()..add(AuthGetCurrentUser())),
+        BlocProvider(
+            create: (context) => AuthBloc()..add(AuthGetCurrentUser())),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -77,13 +77,15 @@ class MyApp extends StatelessWidget {
           PinScreen.routeName: (ctx) => const PinScreen(),
           ProfileEditScreen.routeName: (ctx) => const ProfileEditScreen(),
           ProfileEditPinScreen.routeName: (ctx) => const ProfileEditPinScreen(),
-          ProfileEditSuccessScreen.routeName: (ctx) => const ProfileEditSuccessScreen(),
+          ProfileEditSuccessScreen.routeName: (ctx) =>
+              const ProfileEditSuccessScreen(),
           TopupScreen.routeName: (ctx) => const TopupScreen(),
-          TopupAmountScreen.routeName: (ctx) => const TopupAmountScreen(),
+          // TopupAmountScreen.routeName: (ctx) => const TopupAmountScreen(),
           TopupSuccessScreen.routeName: (ctx) => const TopupSuccessScreen(),
           TransferScreen.routeName: (ctx) => const TransferScreen(),
           TransferAmountScreen.routeName: (ctx) => const TransferAmountScreen(),
-          TransferSuccessScreen.routeName: (ctx) => const TransferSuccessScreen(),
+          TransferSuccessScreen.routeName: (ctx) =>
+              const TransferSuccessScreen(),
           DataProviderScreen.routeName: (ctx) => const DataProviderScreen(),
           DataPackageScreen.routeName: (ctx) => const DataPackageScreen(),
           DataSuccessScreen.routeName: (ctx) => const DataSuccessScreen(),

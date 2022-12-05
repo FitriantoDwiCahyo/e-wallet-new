@@ -4,7 +4,7 @@ import '../../shared/theme.dart';
 
 class CustomFormField extends StatelessWidget {
   final String title;
-  final bool obscureText;
+  final bool obsecureText;
   final TextEditingController? controller;
   final bool isShowTitle;
   final TextInputType? keyboardType;
@@ -12,10 +12,10 @@ class CustomFormField extends StatelessWidget {
   const CustomFormField({
     Key? key,
     required this.title,
-    this.obscureText = false,
+    this.obsecureText = false,
     this.controller,
     this.isShowTitle = true,
-    this.keyboardType
+    this.keyboardType,
   }) : super(key: key);
 
   @override
@@ -33,7 +33,7 @@ class CustomFormField extends StatelessWidget {
           height: 8,
         ),
         TextFormField(
-          obscureText: obscureText,
+          obscureText: obsecureText,
           controller: controller,
           keyboardType: keyboardType,
           decoration: InputDecoration(

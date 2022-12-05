@@ -1,7 +1,9 @@
 import 'package:e_wallet_new/shared/shared_method.dart';
 import 'package:e_wallet_new/ui/widgets/custom_input_pin_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../blocs/auth/auth_bloc.dart';
 import '../../shared/theme.dart';
 
 class PinScreen extends StatefulWidget {
@@ -14,6 +16,8 @@ class PinScreen extends StatefulWidget {
 
 class _PinScreenState extends State<PinScreen> {
   final TextEditingController pinController = TextEditingController(text: '');
+  String pin = '';
+  bool isError = false;
 
   addPin(String number) {
     if (pinController.text.length < 6) {
@@ -23,9 +27,12 @@ class _PinScreenState extends State<PinScreen> {
     }
 
     if (pinController.text.length == 6) {
-      if (pinController.text == '123456') {
+      if (pinController.text == pin) {
         Navigator.of(context).pop(true);
       } else {
+        setState(() {
+          isError = true;
+        });
         showCustomSnackBar(context, 'Pin Salah Serius');
       }
     }
@@ -34,9 +41,20 @@ class _PinScreenState extends State<PinScreen> {
   deletePin() {
     if (pinController.text.isNotEmpty) {
       setState(() {
+        isError = false;
         pinController.text =
             pinController.text.substring(0, pinController.text.length - 1);
       });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthSuccess) {
+      pin = authState.user.pin!;
     }
   }
 
@@ -71,10 +89,10 @@ class _PinScreenState extends State<PinScreen> {
                   cursorColor: greyColor,
                   enabled: false,
                   style: whiteTextStyle.copyWith(
-                    fontSize: 36,
-                    fontWeight: medium,
-                    letterSpacing: 16,
-                  ),
+                      fontSize: 36,
+                      fontWeight: medium,
+                      letterSpacing: 16,
+                      color: isError ? redColor : whiteColor),
                   decoration: InputDecoration(
                     disabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(

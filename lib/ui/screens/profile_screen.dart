@@ -1,10 +1,14 @@
+import 'package:e_wallet_new/shared/shared_method.dart';
 import 'package:e_wallet_new/ui/screens/pin_screen.dart';
 import 'package:e_wallet_new/ui/screens/profile_edit_pin_screen.dart';
 import 'package:e_wallet_new/ui/screens/profile_edit_screen.dart';
+import 'package:e_wallet_new/ui/screens/sign_in_screen.dart';
 import 'package:e_wallet_new/ui/widgets/custom_text_button.dart';
 import 'package:e_wallet_new/ui/widgets/profile_menu_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../blocs/auth/auth_bloc.dart';
 import '../../shared/theme.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -19,115 +23,140 @@ class ProfileScreen extends StatelessWidget {
           'My Profile',
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 24,
-        ),
-        children: [
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
+      body: BlocConsumer<AuthBloc, AuthState>(listener: (context, state) {
+        if (state is AuthFailed) {
+          showCustomSnackBar(context, state.e);
+        }
+
+        if (state is AuthInitial) {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              SignInScreen.routeName, (route) => false);
+        }
+      }, builder: (context, state) {
+        if (state is AuthLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (state is AuthSuccess) {
+          return ListView(
             padding: const EdgeInsets.symmetric(
-              horizontal: 30,
-              vertical: 22,
+              horizontal: 24,
             ),
-            decoration: BoxDecoration(
-              color: whiteColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              children: <Widget>[
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: AssetImage(
-                        'assets/img_profile.png',
-                      ),
-                    ),
-                  ),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: Container(
-                      width: 28,
-                      height: 28,
+            children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 22,
+                ),
+                decoration: BoxDecoration(
+                  color: whiteColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      width: 120,
+                      height: 120,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: whiteColor,
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.check_circle,
-                          color: greenColor,
-                          size: 24,
+                        image: DecorationImage(
+                          image: state.user.profilePicture == null
+                              ? const AssetImage(
+                                  'assets/img_profile.png',
+                                )
+                              : NetworkImage(state.user.profilePicture!)
+                                  as ImageProvider,
                         ),
                       ),
+                      child: state.user.verified == 1
+                          ? Align(
+                              alignment: Alignment.topRight,
+                              child: Container(
+                                width: 28,
+                                height: 28,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: whiteColor,
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.check_circle,
+                                    color: greenColor,
+                                    size: 24,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : null,
                     ),
-                  ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    Text(
+                      state.user.name.toString(),
+                      style: blackTextStyle.copyWith(
+                        fontSize: 18,
+                        fontWeight: medium,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 40,
+                    ),
+                    ProfileMenuItem(
+                        iconUrl: 'assets/ic_edit_profile.png',
+                        title: 'Edit Profile',
+                        onTap: () async {
+                          if (await Navigator.of(context)
+                                  .pushNamed(PinScreen.routeName) ==
+                              true) {
+                            Navigator.of(context)
+                                .pushNamed(ProfileEditScreen.routeName);
+                          }
+                        }),
+                    ProfileMenuItem(
+                        iconUrl: 'assets/ic_pin.png',
+                        title: 'My Pin',
+                        onTap: () async {
+                          if (await Navigator.of(context)
+                                  .pushNamed(PinScreen.routeName) ==
+                              true) {
+                            Navigator.of(context)
+                                .pushNamed(ProfileEditPinScreen.routeName);
+                          }
+                        }),
+                    ProfileMenuItem(
+                      iconUrl: 'assets/ic_wallet.png',
+                      title: 'Wallet Settings',
+                    ),
+                    ProfileMenuItem(
+                      iconUrl: 'assets/ic_reward.png',
+                      title: 'My Rewards',
+                    ),
+                    ProfileMenuItem(
+                      iconUrl: 'assets/ic_help.png',
+                      title: 'Help Center',
+                    ),
+                    ProfileMenuItem(
+                        iconUrl: 'assets/ic_logout.png',
+                        title: 'Log Out',
+                        onTap: () {
+                          context.read<AuthBloc>().add(AuthLogout());
+                        }),
+                  ],
                 ),
-                const SizedBox(
-                  height: 16,
-                ),
-                Text(
-                  'Marsudin',
-                  style: blackTextStyle.copyWith(
-                    fontSize: 18,
-                    fontWeight: medium,
-                  ),
-                ),
-                const SizedBox(
-                  height: 40,
-                ),
-                ProfileMenuItem(
-                    iconUrl: 'assets/ic_edit_profile.png',
-                    title: 'Edit Profile',
-                    onTap: () async {
-                      if (await Navigator.of(context)
-                              .pushNamed(PinScreen.routeName) ==
-                          true) {
-                        Navigator.of(context)
-                            .pushNamed(ProfileEditScreen.routeName);
-                      }
-                    }),
-                ProfileMenuItem(
-                    iconUrl: 'assets/ic_pin.png',
-                    title: 'My Pin',
-                    onTap: () async {
-                      if (await Navigator.of(context)
-                              .pushNamed(PinScreen.routeName) ==
-                          true) {
-                        Navigator.of(context)
-                            .pushNamed(ProfileEditPinScreen.routeName);
-                      }
-                    }),
-                ProfileMenuItem(
-                  iconUrl: 'assets/ic_wallet.png',
-                  title: 'Wallet Settings',
-                ),
-                ProfileMenuItem(
-                  iconUrl: 'assets/ic_reward.png',
-                  title: 'My Rewards',
-                ),
-                ProfileMenuItem(
-                  iconUrl: 'assets/ic_help.png',
-                  title: 'Help Center',
-                ),
-                ProfileMenuItem(
-                  iconUrl: 'assets/ic_logout.png',
-                  title: 'Log Out',
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 57,
-          ),
-          CustomTextButton(title: 'Report Problem')
-        ],
-      ),
+              ),
+              const SizedBox(
+                height: 57,
+              ),
+              CustomTextButton(title: 'Report Problem')
+            ],
+          );
+        }
+        return Container();
+      }),
     );
   }
 }
