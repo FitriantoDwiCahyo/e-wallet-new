@@ -416,7 +416,7 @@ class HomeScreen extends StatelessWidget {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: <Widget>[
+              children: const <Widget>[
                 HomeUserItem(
                   imageUrl: 'assets/img_friend1.png',
                   username: 'Yuanita',

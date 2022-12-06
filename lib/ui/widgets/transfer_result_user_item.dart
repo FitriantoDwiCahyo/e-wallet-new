@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../../models/user_model.dart';
 import '../../shared/theme.dart';
 
 class TransferResultUserItem extends StatelessWidget {
-  final String imageUrl;
-  final String name;
-  final String username;
-  final bool isVerified;
+  final UserModel user;
+
   final bool isSelected;
 
   const TransferResultUserItem({
     Key? key,
-    required this.name,
-    required this.username,
-    required this.imageUrl,
-    this.isVerified = false,
+    required this.user,
     this.isSelected = false,
   }) : super(key: key);
 
@@ -32,7 +28,8 @@ class TransferResultUserItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(
           20,
         ),
-        border: Border.all(color: isSelected ? blueColor: whiteColor,width: 2),
+        border:
+            Border.all(color: isSelected ? blueColor : whiteColor, width: 2),
       ),
       child: Column(
         children: <Widget>[
@@ -42,12 +39,14 @@ class TransferResultUserItem extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               image: DecorationImage(
-                image: AssetImage(
-                  imageUrl,
-                ),
+                image: user.profilePicture == null
+                    ? const AssetImage(
+                        'assets/img_profile.png',
+                      )
+                    : NetworkImage(user.profilePicture!) as ImageProvider,
               ),
             ),
-            child: isVerified
+            child: user.verified == 1
                 ? Align(
                     alignment: Alignment.topRight,
                     child: Container(
@@ -72,19 +71,21 @@ class TransferResultUserItem extends StatelessWidget {
             height: 14,
           ),
           Text(
-            name,
+            user.name.toString(),
             style: blackTextStyle.copyWith(
               fontSize: 16,
               fontWeight: medium,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           const SizedBox(
             height: 2,
           ),
           Text(
-            '@$username',
+            '@${user.username.toString()}',
             style: greyTextStyle.copyWith(
               fontSize: 12,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

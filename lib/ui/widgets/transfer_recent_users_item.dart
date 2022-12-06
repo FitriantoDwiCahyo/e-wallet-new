@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../models/user_model.dart';
 import '../../shared/theme.dart';
 
 class TransferRecentUsersItem extends StatelessWidget {
-  final String imageUrl;
-  final String name;
-  final String username;
-  final bool isVerified;
+  final UserModel user;
 
   const TransferRecentUsersItem({
     Key? key,
-    required this.name,
-    required this.username,
-    required this.imageUrl,
-    this.isVerified = false,
+    required this.user,
   }) : super(key: key);
 
   @override
@@ -39,7 +34,9 @@ class TransferRecentUsersItem extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(imageUrl),
+                image: user.profilePicture == null
+                    ? const AssetImage('assets/img_profile.png')
+                    : NetworkImage(user.profilePicture!) as ImageProvider,
               ),
             ),
           ),
@@ -47,7 +44,7 @@ class TransferRecentUsersItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                name,
+                user.name.toString(),
                 style: blackTextStyle.copyWith(
                   fontSize: 16,
                   fontWeight: medium,
@@ -57,7 +54,7 @@ class TransferRecentUsersItem extends StatelessWidget {
                 height: 2,
               ),
               Text(
-                '@$username',
+                '@${user.username.toString()}',
                 style: greyTextStyle.copyWith(
                   fontSize: 12,
                 ),
@@ -65,25 +62,26 @@ class TransferRecentUsersItem extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          if(isVerified)Row(
-            children: <Widget>[
-              Icon(
-                Icons.check_circle,
-                size: 14,
-                color: greenColor,
-              ),
-              const SizedBox(
-                width: 4,
-              ),
-              Text(
-                'Verified',
-                style: greenTextStyle.copyWith(
-                  fontSize: 11,
-                  fontWeight: medium,
+          if (user.verified == 1)
+            Row(
+              children: <Widget>[
+                Icon(
+                  Icons.check_circle,
+                  size: 14,
+                  color: greenColor,
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(
+                  width: 4,
+                ),
+                Text(
+                  'Verified',
+                  style: greenTextStyle.copyWith(
+                    fontSize: 11,
+                    fontWeight: medium,
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );

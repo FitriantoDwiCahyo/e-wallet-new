@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'blocs/auth/auth_bloc.dart';
+import 'blocs/user/user_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,7 +39,14 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-            create: (context) => AuthBloc()..add(AuthGetCurrentUser())),
+          create: (context) => AuthBloc()
+            ..add(
+              AuthGetCurrentUser(),
+            ),
+        ),
+        BlocProvider(
+          create: (context) => UserBloc(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -83,7 +91,7 @@ class MyApp extends StatelessWidget {
           // TopupAmountScreen.routeName: (ctx) => const TopupAmountScreen(),
           TopupSuccessScreen.routeName: (ctx) => const TopupSuccessScreen(),
           TransferScreen.routeName: (ctx) => const TransferScreen(),
-          TransferAmountScreen.routeName: (ctx) => const TransferAmountScreen(),
+          // TransferAmountScreen.routeName: (ctx) => const TransferAmountScreen(),
           TransferSuccessScreen.routeName: (ctx) =>
               const TransferSuccessScreen(),
           DataProviderScreen.routeName: (ctx) => const DataProviderScreen(),
