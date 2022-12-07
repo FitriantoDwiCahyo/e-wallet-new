@@ -91,11 +91,11 @@ class MyApp extends StatelessWidget {
           // TopupAmountScreen.routeName: (ctx) => const TopupAmountScreen(),
           TopupSuccessScreen.routeName: (ctx) => const TopupSuccessScreen(),
           TransferScreen.routeName: (ctx) => const TransferScreen(),
-          // TransferAmountScreen.routeName: (ctx) => const TransferAmountScreen(),
+          // Transfe rAmountScreen.routeName: (ctx) => const TransferAmountScreen(),
           TransferSuccessScreen.routeName: (ctx) =>
               const TransferSuccessScreen(),
           DataProviderScreen.routeName: (ctx) => const DataProviderScreen(),
-          DataPackageScreen.routeName: (ctx) => const DataPackageScreen(),
+          // DataPackageScreen.routeName: (ctx) => const DataPackageScreen(),
           DataSuccessScreen.routeName: (ctx) => const DataSuccessScreen(),
         },
       ),

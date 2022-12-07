@@ -1,14 +1,25 @@
+import 'package:e_wallet_new/blocs/auth/auth_bloc.dart';
+import 'package:e_wallet_new/models/operator_card_model.dart';
 import 'package:e_wallet_new/shared/shared_method.dart';
 import 'package:e_wallet_new/ui/screens/data_package_screen.dart';
 import 'package:e_wallet_new/ui/widgets/custom_filled_button.dart';
 import 'package:e_wallet_new/ui/widgets/data_provider_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../blocs/operator_card/operator_card_bloc.dart';
 import '../../shared/theme.dart';
 
-class DataProviderScreen extends StatelessWidget {
+class DataProviderScreen extends StatefulWidget {
   static const routeName = '/data-provider';
   const DataProviderScreen({Key? key}) : super(key: key);
+
+  @override
+  State<DataProviderScreen> createState() => _DataProviderScreenState();
+}
+
+class _DataProviderScreenState extends State<DataProviderScreen> {
+  OperatorCardModel? selectedOperatorCard;
 
   @override
   Widget build(BuildContext context) {
@@ -43,27 +54,33 @@ class DataProviderScreen extends StatelessWidget {
               const SizedBox(
                 width: 16,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    '8008 2208 1996',
-                    style: blackTextStyle.copyWith(
-                      fontSize: 16,
-                      fontWeight: medium,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 2,
-                  ),
-                  Text(
-                    'Balance: ${formatCurrency(1220000)}',
-                    style: greyTextStyle.copyWith(
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
+              BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+                if (state is AuthSuccess) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        state.user.cardNumber!.replaceAllMapped(
+                            RegExp(r".{4}"), (match) => "${match.group(0)}"),
+                        style: blackTextStyle.copyWith(
+                          fontSize: 16,
+                          fontWeight: medium,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 2,
+                      ),
+                      Text(
+                        'Balance: ${formatCurrency(state.user.balance ?? 0)}',
+                        style: greyTextStyle.copyWith(
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return Container();
+              }),
             ],
           ),
           const SizedBox(
@@ -79,37 +96,52 @@ class DataProviderScreen extends StatelessWidget {
           const SizedBox(
             height: 14,
           ),
-          const DataProviderItem(
-            imgUrl: 'assets/img_provider_telkomsel.png',
-            title: 'Telkomsel',
-            isAvailable: true,
-            isSelected: true,
-          ),
-          const DataProviderItem(
-            imgUrl: 'assets/img_provider_indosat.png',
-            title: 'Indosat',
-            isAvailable: true,
-            isSelected: false,
-          ),
-          const DataProviderItem(
-            imgUrl: 'assets/img_provider_singtel.png',
-            title: 'Singtel',
-            isAvailable: true,
-            isSelected: false,
-          ),
-          const SizedBox(
-            height: 125,
-          ),
-          CustomFilledButtons(
-            title: 'Continue',
-            onPressed: () =>
-                Navigator.of(context).pushNamed(DataPackageScreen.routeName),
-          ),
-          const SizedBox(
-            height: 57,
+          BlocProvider(
+            create: (context) => OperatorCardBloc()..add(OperatorCardGet()),
+            child: BlocBuilder<OperatorCardBloc, OperatorCardState>(
+              builder: (context, state) {
+                if (state is OperatorCardSuccess) {
+                  return Column(
+                    children: state.operatorCards.map(
+                      (operatorCard) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedOperatorCard = operatorCard;
+                            });
+                          },
+                          child: DataProviderItem(
+                            operatorCard: operatorCard,
+                            isSelected:
+                                operatorCard.id == selectedOperatorCard?.id,
+                          ),
+                        );
+                      },
+                    ).toList(),
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
           ),
         ],
       ),
+      floatingActionButton: (selectedOperatorCard != null)
+          ? Container(
+              margin: const EdgeInsets.all(24),
+              child: CustomFilledButtons(
+                title: 'Continue',
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => DataPackageScreen(
+                      operatorCard: selectedOperatorCard!,
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : Container(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

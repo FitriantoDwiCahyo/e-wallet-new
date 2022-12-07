@@ -5,11 +5,27 @@ import 'package:e_wallet_new/ui/widgets/custom_form_field.dart';
 import 'package:e_wallet_new/ui/widgets/package_item.dart';
 import 'package:flutter/material.dart';
 
+import '../../models/data_plan_model.dart';
+import '../../models/operator_card_model.dart';
 import '../../shared/theme.dart';
 
-class DataPackageScreen extends StatelessWidget {
+class DataPackageScreen extends StatefulWidget {
   static const routeName = '/data-package';
-  const DataPackageScreen({Key? key}) : super(key: key);
+
+  final OperatorCardModel operatorCard;
+
+  const DataPackageScreen({
+    Key? key,
+    required this.operatorCard,
+  }) : super(key: key);
+
+  @override
+  State<DataPackageScreen> createState() => _DataPackageScreenState();
+}
+
+class _DataPackageScreenState extends State<DataPackageScreen> {
+  final phoneController = TextEditingController(text: '');
+  DataPlanModel? selecetedDataPlan;
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +49,10 @@ class DataPackageScreen extends StatelessWidget {
           const SizedBox(
             height: 14,
           ),
-          const CustomFormField(
+          CustomFormField(
             title: '+62',
             isShowTitle: false,
+            controller: phoneController,
           ),
           const SizedBox(
             height: 40,
@@ -53,40 +70,41 @@ class DataPackageScreen extends StatelessWidget {
           Wrap(
             spacing: 17,
             runSpacing: 17,
-            children: const [
-              PackageItem(
-                amount: 10,
-                price: 100000,
-                isSelected: true,
-              ),
-              PackageItem(
-                amount: 25,
-                price: 100000,
-              ),
-              PackageItem(
-                amount: 40,
-                price: 100000,
-              ),
-              PackageItem(
-                amount: 100,
-                price: 100000,
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 80,
-          ),
-          CustomFilledButtons(
-            title: 'Continue',
-            onPressed: () async {
-              if (await Navigator.of(context).pushNamed(PinScreen.routeName) ==
-                  true) {
-                Navigator.of(context).pushNamed(DataSuccessScreen.routeName);
-              }
-            },
+            children: widget.operatorCard.dataPlans!.map(
+              (dataPlan) {
+                return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selecetedDataPlan = dataPlan;
+                      });
+                    },
+                    child: PackageItem(
+                      dataPlan: dataPlan,
+                      isSelected: dataPlan.id == selecetedDataPlan?.id,
+                    ));
+              },
+            ).toList(),
           ),
         ],
       ),
+      floatingActionButton:
+          (selecetedDataPlan != null && phoneController.text.isNotEmpty)
+              ? Container(
+                  margin: const EdgeInsets.all(24),
+                  child: CustomFilledButtons(
+                    title: 'Continue',
+                    onPressed: ()  {
+                      // if (await Navigator.of(context)
+                      //         .pushNamed(PinScreen.routeName) ==
+                      //     true) {
+                      //   Navigator.of(context)
+                      //       .push(MaterialPageRoute(builder: (context) => ));
+                      // }
+                    },
+                  ),
+                )
+              : Container(),
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
