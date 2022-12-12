@@ -5,6 +5,7 @@ import 'package:e_wallet_new/shared/shared_values.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/data_plan_form_model.dart';
+import '../models/transaction_model.dart';
 import '../models/transfer_form_model.dart';
 import 'auth_service.dart';
 
@@ -46,6 +47,7 @@ class TransactionService {
       rethrow;
     }
   }
+
   Future<void> dataPlan(DataPlanFormModel data) async {
     try {
       final token = await AuthService().getToken();
@@ -59,6 +61,32 @@ class TransactionService {
       if (res.statusCode != 200) {
         throw jsonDecode(res.body)['message'];
       }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<TransactionModel>> getTransactions() async {
+    try {
+      final token = await AuthService().getToken();
+
+      final res = await http.get(
+        Uri.parse('$baseUrl/transactions'),
+        headers: {
+          'Authorization': token,
+        },
+      );
+
+      if (res.statusCode == 200) {
+        return List<TransactionModel>.from(
+          jsonDecode(res.body)['data'].map(
+            (transaction) => TransactionModel.fromJson(transaction),
+          ),
+        ).toList();
+      }
+
+      throw jsonDecode(res.body)['message'];
+      
     } catch (e) {
       rethrow;
     }

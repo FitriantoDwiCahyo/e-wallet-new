@@ -95,7 +95,7 @@ class MyApp extends StatelessWidget {
           TransferSuccessScreen.routeName: (ctx) =>
               const TransferSuccessScreen(),
           DataProviderScreen.routeName: (ctx) => const DataProviderScreen(),
-          // DataPackageScreen.routeName: (ctx) => const DataPackageScreen(),
+          // DataPacka    geScreen.routeName: (ctx) => const DataPackageScreen(),
           DataSuccessScreen.routeName: (ctx) => const DataSuccessScreen(),
         },
       ),

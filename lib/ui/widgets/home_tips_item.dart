@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../models/tip_model.dart';
 import '../../shared/theme.dart';
 
 class HomeTipsItem extends StatelessWidget {
-  final String imageUrl;
-  final String title;
-  final String url;
+  final TipModel tip;
 
   const HomeTipsItem({
     Key? key,
-    required this.imageUrl,
-    required this.title,
-    required this.url,
+    required this.tip
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () async{
-        if(await canLaunch(url)){
-          launch(url);
+      onTap: () async {
+        if (await canLaunch(tip.url.toString())) {
+          launch(tip.url.toString());
         }
       },
       child: Container(
@@ -36,8 +33,8 @@ class HomeTipsItem extends StatelessWidget {
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(20),
               ),
-              child: Image.asset(
-                imageUrl,
+              child: Image.network(
+                tip.thumbnail.toString(),
                 width: 155,
                 height: 110,
                 fit: BoxFit.cover,
@@ -47,9 +44,11 @@ class HomeTipsItem extends StatelessWidget {
               height: 12,
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12,),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+              ),
               child: Text(
-                title,
+                tip.title.toString(),
                 style: blackTextStyle.copyWith(
                   fontSize: 14,
                   fontWeight: medium,

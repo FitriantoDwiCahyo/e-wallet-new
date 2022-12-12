@@ -1,7 +1,9 @@
+import 'package:e_wallet_new/models/transfer_form_model.dart';
 import 'package:e_wallet_new/shared/shared_method.dart';
 import 'package:e_wallet_new/ui/screens/data_provider_screen.dart';
 import 'package:e_wallet_new/ui/screens/profile_screen.dart';
 import 'package:e_wallet_new/ui/screens/topup_screen.dart';
+import 'package:e_wallet_new/ui/screens/transfer_amount_screen.dart';
 import 'package:e_wallet_new/ui/screens/transfer_screen.dart';
 import 'package:e_wallet_new/ui/widgets/home_latest_transaction_item.dart';
 import 'package:e_wallet_new/ui/widgets/home_service_item.dart';
@@ -11,6 +13,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../blocs/auth/auth_bloc.dart';
+import '../../blocs/tip/tip_bloc.dart';
+import '../../blocs/transaction/transaction_bloc.dart';
+import '../../blocs/user/user_bloc.dart';
 import '../../shared/theme.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -198,7 +203,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                '**** **** **** ${state.user.cardNumber!.substring(12,16)}',
+                '**** **** **** ${state.user.cardNumber!.substring(12, 16)}',
                 style: whiteTextStyle.copyWith(
                   fontSize: 18,
                   fontWeight: medium,
@@ -222,8 +227,7 @@ class HomeScreen extends StatelessWidget {
         );
       }
       return Container();
-    }
-    );
+    });
   }
 
   Widget buildLevel() {
@@ -354,40 +358,25 @@ class HomeScreen extends StatelessWidget {
               ),
               color: whiteColor,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                HomeLatestTransactionItem(
-                  iconUrl: 'assets/ic_transaction_cat1.png',
-                  title: 'Top Up',
-                  time: 'Yesterday',
-                  amount: '+ ${formatCurrency(480000, symbol: '')}',
-                ),
-                HomeLatestTransactionItem(
-                  iconUrl: 'assets/ic_transaction_cat2.png',
-                  title: 'Cashback',
-                  time: 'sep 8',
-                  amount: '+ ${formatCurrency(480000, symbol: '')}',
-                ),
-                HomeLatestTransactionItem(
-                  iconUrl: 'assets/ic_transaction_cat3.png',
-                  title: 'Withdraw',
-                  time: 'sep2',
-                  amount: '- ${formatCurrency(5000, symbol: '')}',
-                ),
-                HomeLatestTransactionItem(
-                  iconUrl: 'assets/ic_transaction_cat4.png',
-                  title: 'Transfer',
-                  time: 'Aug 27',
-                  amount: '- ${formatCurrency(123000, symbol: '')}',
-                ),
-                HomeLatestTransactionItem(
-                  iconUrl: 'assets/ic_transaction_cat5.png',
-                  title: 'Electric',
-                  time: 'Feb 17',
-                  amount: '- ${formatCurrency(12333, symbol: '')}',
-                ),
-              ],
+            child: BlocProvider(
+              create: (context) => TransactionBloc()..add(TransactionGet()),
+              child: BlocBuilder<TransactionBloc, TransactionState>(
+                builder: (context, state) {
+                  if (state is TransactionSuccess) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: state.transactions.map(
+                        (transaction) {
+                          return HomeLatestTransactionItem(
+                            transaction: transaction,
+                          );
+                        },
+                      ).toList(),
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
             ),
           ),
         ],
@@ -413,27 +402,38 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(
             height: 14,
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: const <Widget>[
-                HomeUserItem(
-                  imageUrl: 'assets/img_friend1.png',
-                  username: 'Yuanita',
-                ),
-                HomeUserItem(
-                  imageUrl: 'assets/img_friend2.png',
-                  username: 'Yuanita',
-                ),
-                HomeUserItem(
-                  imageUrl: 'assets/img_friend3.png',
-                  username: 'Yuanita',
-                ),
-                HomeUserItem(
-                  imageUrl: 'assets/img_friend4.png',
-                  username: 'Yuanita',
-                ),
-              ],
+          BlocProvider(
+            create: (context) => UserBloc()..add(UserGetRecent()),
+            child: BlocBuilder<UserBloc, UserState>(
+              builder: (context, state) {
+                if (state is UserSuccess) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: state.users.map(
+                        (user) {
+                          return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TransferAmountScreen(
+                                      data: TransferFormModel(
+                                          sendTo: user.username),
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: HomeUserItem(
+                                user: user,
+                              ));
+                        },
+                      ).toList(),
+                    ),
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
             ),
           ),
         ],
@@ -460,32 +460,27 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(
             height: 14,
           ),
-          Wrap(
-            // alignment: WrapAlignment.end,
-            spacing: 50,
-            runSpacing: 10,
-            children: const [
-              HomeTipsItem(
-                imageUrl: 'assets/img_tips1.png',
-                title: 'Best tips for using a credit card',
-                url: 'https://google.com',
-              ),
-              HomeTipsItem(
-                imageUrl: 'assets/img_tips2.png',
-                title: 'Best tips for using a credit card',
-                url: 'dsda',
-              ),
-              HomeTipsItem(
-                imageUrl: 'assets/img_tips3.png',
-                title: 'Best tips for using a credit card',
-                url: 'dsda',
-              ),
-              HomeTipsItem(
-                imageUrl: 'assets/img_tips4.png',
-                title: 'Best tips for using a credit card',
-                url: 'dsda',
-              ),
-            ],
+          BlocProvider(
+            create: (context) => TipBloc()..add(TipGet()),
+            child: BlocBuilder<TipBloc, TipState>(
+              builder: (context, state) {
+                if (state is TipSuccess) {
+                  return Wrap(
+                    // alignment: WrapAlignment.end,
+                    spacing: 30,
+                    runSpacing: 10,
+                    children: state.tips.map(
+                      (tip) {
+                        return HomeTipsItem(
+                          tip: tip,
+                        );
+                      },
+                    ).toList(),
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
           ),
         ],
       ),
